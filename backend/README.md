@@ -1,98 +1,288 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# iTunes Search Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A modern, clean REST API built with **NestJS**, **TypeORM**, and **PostgreSQL** that integrates with the iTunes Search API to search, store, and retrieve media content using an optimized two-table database structure.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Features
 
-## Description
+- **Two-Table Database Structure** - Optimized data organization with separate search history and results tables
+- **Search iTunes API** - Search for podcasts, music, movies, and more
+- **Smart Caching** - Duplicate search detection and cached result retrieval
+- **Database Storage** - Automatically store search results with proper relationships
+- **Search History Tracking** - Complete search parameter tracking and result analytics
+- **Modern TypeScript** - Full type safety and clean interfaces
+- **Error Handling** - Comprehensive error handling and validation
+- **RESTful Design** - Clean, consistent API endpoints
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🏗️ Database Architecture
 
-## Project setup
+### Two-Table Structure
+The application uses an optimized two-table structure:
 
-```bash
-$ npm install
+1. **search_history** - Main table storing search parameters and metadata
+2. **search_results** - Child table storing individual iTunes results
+
+This provides better organization, reduced redundancy, and improved performance.
+
+## 🏗️ Project Structure
+
+```
+src/
+├── itunes-search/
+│   ├── entities/
+│   │   ├── search-history.entity.ts    # Main search data entity
+│   │   └── search-result.entity.ts     # Individual results entity
+│   ├── interfaces/
+│   │   └── itunes-api.interface.ts     # iTunes API types
+│   ├── types/
+│   │   └── api-response.types.ts       # Clean response types
+│   ├── dto/
+│   │   └── search-query.dto.ts         # Request validation
+│   ├── itunes-search.controller.ts     # REST endpoints
+│   ├── itunes-search.service.ts        # Business logic
+│   └── itunes-search.module.ts         # Module configuration
+├── app.module.ts                       # Main app module
+└── main.ts                             # Application entry point
 ```
 
-## Compile and run the project
+## 🛠️ Tech Stack
 
+- **NestJS** - Modern Node.js framework
+- **TypeORM** - Database ORM with TypeScript support
+- **PostgreSQL** - Advanced relational database
+- **Axios** - HTTP client for iTunes API
+- **TypeScript** - Type-safe development
+
+## 📋 Prerequisites
+
+- Node.js (v16 or higher)
+- PostgreSQL (v12 or higher)
+- npm or yarn
+
+## ⚡ Quick Start
+
+### 1. Install Dependencies
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
-
+### 2. Setup Database
 ```bash
-# unit tests
-$ npm run test
+# Create PostgreSQL database
+psql -U postgres -c "CREATE DATABASE itunes_search_db ENCODING 'UTF8' LC_COLLATE 'en_US.UTF-8' LC_CTYPE 'en_US.UTF-8';"
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Run migration if upgrading from single-table structure
+psql -U postgres -d itunes_search_db -f database-migration.sql
 ```
 
-## Deployment
+**Need help with PostgreSQL setup?** See [TWO_TABLE_STRUCTURE.md](./TWO_TABLE_STRUCTURE.md) for detailed documentation.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### 3. Configure Environment (Optional)
+Create `.env` file or use defaults:
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_DATABASE=itunes_search_db
+PORT=3000
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 4. Start the Application
+```bash
+# Development mode
+npm run start:dev
 
-## Resources
+# Production mode
+npm run build
+npm run start:prod
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+## 🔥 API Endpoints
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 1. Search iTunes Content
 
-## Support
+**POST** `/api/itunes/search`
+```json
+{
+  "term": "فنجان",
+  "media": "podcast",
+  "country": "US",
+  "limit": 50
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**GET** `/api/itunes/search?term=فنجان&media=podcast&limit=10`
 
-## Stay in touch
+Returns a SearchHistory object with nested results.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 2. Get All Searches
 
-## License
+**GET** `/api/itunes/searches`
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Returns all search records with their complete results.
+
+### 3. Get Search by ID
+
+**GET** `/api/itunes/search/{id}`
+
+Returns a specific search record with all its results.
+
+### 4. Get Search History Summary
+
+**GET** `/api/itunes/history`
+
+Returns search terms with result counts (summary view).
+
+### 5. Get Searches by Term
+
+**GET** `/api/itunes/results/{searchTerm}`
+
+Returns all search records matching the search term.
+
+## 📊 Response Format
+
+All endpoints return consistent JSON responses:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "searchTerm": "فنجان",
+    "media": "podcast",
+    "country": "US",
+    "limit": 50,
+    "resultCount": 25,
+    "createdAt": "2024-01-15T10:30:00Z",
+    "results": [
+      {
+        "id": 1,
+        "trackId": 1436487555,
+        "artistName": "شبكة ثمانية",
+        "trackName": "فنجان مع عبدالرحمن أبومالح",
+        // ... other iTunes fields
+      }
+    ]
+  },
+  "message": "Found 25 results for \"فنجان\"",
+  "count": 25
+}
+```
+
+## 🎯 Media Types
+
+- `podcast` - Podcasts
+- `music` - Music tracks
+- `movie` - Movies
+- `audiobook` - Audiobooks
+- `tvShow` - TV shows
+- `software` - Applications
+- `ebook` - E-books
+- `all` - All media types (default)
+
+## 🧪 Testing
+
+Run the comprehensive test suite:
+
+```bash
+# Test the two-table API structure
+node test-two-table-api.js
+```
+
+### Manual Testing with curl
+
+```bash
+# Search for content
+curl -X POST http://localhost:3000/api/itunes/search \
+  -H "Content-Type: application/json" \
+  -d '{"term": "فنجان", "media": "podcast", "limit": 5}'
+
+# Get all searches with results
+curl http://localhost:3000/api/itunes/searches
+
+# Get specific search by ID
+curl http://localhost:3000/api/itunes/search/1
+
+# Get search history summary
+curl http://localhost:3000/api/itunes/history
+```
+
+## 📱 Example: Searching for Fnjan Podcast
+
+```bash
+curl -X POST http://localhost:3000/api/itunes/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "term": "فنجان",
+    "media": "podcast",
+    "country": "US",
+    "limit": 10
+  }'
+```
+
+## 🔒 Database Schema
+
+### search_history Table
+```sql
+CREATE TABLE search_history (
+    id SERIAL PRIMARY KEY,
+    searchTerm VARCHAR(255) NOT NULL,
+    media VARCHAR(50) DEFAULT 'all',
+    country VARCHAR(50) DEFAULT 'US',
+    "limit" INTEGER DEFAULT 50,
+    resultCount INTEGER DEFAULT 0,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### search_results Table
+```sql
+CREATE TABLE search_results (
+    id SERIAL PRIMARY KEY,
+    searchHistoryId INTEGER NOT NULL,
+    trackId BIGINT NOT NULL,
+    artistName VARCHAR(500),
+    collectionName VARCHAR(500),
+    trackName VARCHAR(500),
+    artworkUrl30 TEXT,
+    artworkUrl60 TEXT,
+    artworkUrl100 TEXT,
+    collectionViewUrl TEXT,
+    trackViewUrl TEXT,
+    primaryGenreName VARCHAR(255),
+    country VARCHAR(255),
+    releaseDate TIMESTAMP,
+    // ... other iTunes fields
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (searchHistoryId) REFERENCES search_history(id) ON DELETE CASCADE
+);
+```
+
+## 📄 Documentation
+
+- [TWO_TABLE_STRUCTURE.md](./TWO_TABLE_STRUCTURE.md) - Complete two-table structure documentation
+- [database-migration.sql](./database-migration.sql) - Migration script from single to two-table structure
+- [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Detailed API documentation
+
+## 🚀 Key Benefits
+
+1. **Optimized Performance** - Separate tables for better query performance
+2. **Reduced Redundancy** - Search parameters stored once per search
+3. **Smart Caching** - Automatic duplicate detection and cached responses
+4. **Comprehensive Tracking** - Complete search parameter and result history
+5. **Scalable Architecture** - Designed for large result sets and high traffic
+
+## 🔧 Development
+
+```bash
+# Run in development mode
+npm run start:dev
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
+```
