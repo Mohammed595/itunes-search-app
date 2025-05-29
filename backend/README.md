@@ -9,7 +9,6 @@ A production-ready REST API built with **NestJS**, **TypeORM**, and **PostgreSQL
 - **Intelligent Caching** - Prevents duplicate API calls and improves response times
 - **Unicode Support** - Full support for Arabic, Chinese, and all international characters
 - **Advanced Filtering** - Automatically filters invalid results (e.g., audiobooks without trackId)
-- **Type Safety** - Complete TypeScript implementation with proper validation
 - **Production Ready** - Comprehensive error handling, logging, and validation
 
 ## 🔗 Live API
@@ -37,11 +36,6 @@ curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=كلم�
 └─────────────────┘    └─────────────────┘
 ```
 
-**Benefits:**
-- Eliminates data redundancy
-- Supports multiple search results per query
-- Enables efficient caching and analytics
-- Optimized for large-scale data
 
 ## 🛠️ Tech Stack
 
@@ -77,17 +71,8 @@ createdb itunes_search_db
 psql -U postgres -c "CREATE DATABASE itunes_search_db;"
 ```
 
-### 3. Configuration
-Create `.env` (optional - uses sensible defaults):
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-DB_DATABASE=itunes_search_db
-```
 
-### 4. Start Application
+### ٣. Start Application
 ```bash
 # Development
 npm run start:dev
@@ -96,7 +81,6 @@ npm run start:dev
 npm run build && npm run start:prod
 ```
 
-🎉 **Local Development:** `http://localhost:3000`  
 🌐 **Production API:** `https://itunes-search-app-1hcy.onrender.com/`
 
 ## 🔥 API Reference
@@ -209,32 +193,11 @@ Full Unicode support for all languages:
 # Arabic
 curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=فنجان"
 
-# Chinese  
-curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=音乐"
-
 # Japanese
 curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=音楽"
 
-# Spanish
-curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=música"
 ```
 
-## ⚡ Performance Features
-
-### Intelligent Caching
-- Detects duplicate searches automatically
-- Updates cached results with fresh data
-- Reduces iTunes API calls by 70%+
-
-### Smart Filtering
-- Automatically skips invalid results (audiobooks without trackId)
-- Maintains accurate result counts
-- Prevents database constraint violations
-
-### Optimized Queries
-- Efficient foreign key relationships
-- Indexed search terms and timestamps
-- Minimal data transfer
 
 ## 🧪 Testing
 
@@ -251,27 +214,7 @@ The application has been thoroughly tested with a comprehensive test suite cover
 
 ## 🚀 Production Deployment
 
-### Environment Variables
-```env
-NODE_ENV=production
-PORT=3000
-DB_HOST=your-postgres-host
-DB_PORT=5432
-DB_USERNAME=your-username
-DB_PASSWORD=your-password
-DB_DATABASE=itunes_search_db
-```
 
-### Docker Support
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY dist ./dist
-EXPOSE 3000
-CMD ["node", "dist/main"]
-```
 
 ### Health Monitoring
 - Comprehensive logging with NestJS Logger
@@ -341,24 +284,9 @@ curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=Harry%2
 # TV Shows search
 curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=Friends&media=tvShow"
 ```
+Fast response times worldwide via Render.com
 
-## 🎯 Performance Metrics
 
-- **Response Time:** < 200ms (cached) / < 2s (fresh)
-- **Database:** Optimized queries with proper indexing
-- **Memory:** Efficient object mapping and garbage collection
-- **Throughput:** Handles 1000+ concurrent requests
-- **Reliability:** 99.9% uptime with proper error handling
-- **Global CDN:** Fast response times worldwide via Render.com
-
-## 🛡️ Security & Validation
-
-- Input validation with class-validator
-- SQL injection prevention via TypeORM
-- Rate limiting ready (implement as needed)
-- CORS configuration available
-- Environment variable protection
-- HTTPS enforced in production
 
 ## 🌟 Quick Test
 
@@ -380,10 +308,3 @@ Try these endpoints right now:
    ```
 
 ---
-
-## 📞 Support
-
-Built with ❤️ using modern TypeScript and NestJS best practices.
-
-**Status:** ✅ Production Ready | **Version:** 1.0.0 | **Tests:** 17/17 Passing  
-**Live API:** https://itunes-search-app-1hcy.onrender.com/
