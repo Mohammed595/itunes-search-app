@@ -15,10 +15,10 @@ export class SearchHistory {
   @Column({ type: 'varchar', length: 255 })
   searchTerm: string;
 
-  @Column({ type: 'int', default: 50 })
+  @Column({ type: 'int' })
   limit: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int' })
   resultCount: number;
 
   @OneToMany('SearchResult', 'searchHistory', { cascade: true })

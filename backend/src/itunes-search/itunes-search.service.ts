@@ -15,6 +15,7 @@ import { SearchHistoryItem } from './types/api-response.types';
 export class ItunesSearchService {
   private readonly logger = new Logger(ItunesSearchService.name);
   private readonly iTunesApiUrl = 'https://itunes.apple.com/search';
+  private readonly apiTimeout = 10000;
 
   constructor(
     @InjectRepository(SearchResult)
@@ -25,132 +26,43 @@ export class ItunesSearchService {
 
   async search(searchQuery: SearchQueryDto): Promise<SearchHistory> {
     try {
-      this.logger.log(`Searching iTunes API for term: ${searchQuery.term}`);
+      this.logger.log(`Searching iTunes API for: "${searchQuery.term}"`);
 
-      const existingSearch = await this.searchHistoryRepository.findOne({
-        where: {
-          searchTerm: searchQuery.term,
-        },
+      const cachedResult = await this.searchHistoryRepository.findOne({
+        where: { searchTerm: searchQuery.term },
         relations: ['results'],
       });
+      const apiResponse = await this.fetchFromItunesApi(searchQuery);
 
-      if (existingSearch) {
-        this.logger.log(`Found existing search for term: ${searchQuery.term}`);
-        return existingSearch;
+      if (cachedResult) {
+        this.logger.log(`Cache hit for: "${searchQuery.term}"`);
+        const newResults = await this.updateCachedResults(
+          searchQuery,
+          apiResponse.results,
+        );
+        return newResults;
       }
 
-      const iTunesResponse = await this.searchItunesApi(searchQuery);
-
-      if (!iTunesResponse.results || iTunesResponse.results.length === 0) {
-        this.logger.warn(`No results found for term: ${searchQuery.term}`);
-
-        const emptySearchHistory = new SearchHistory();
-        emptySearchHistory.searchTerm = searchQuery.term;
-        emptySearchHistory.limit = searchQuery.limit || 50;
-        emptySearchHistory.resultCount = 0;
-        emptySearchHistory.results = [];
-
-        return emptySearchHistory;
+      if (this.isEmptyResponse(apiResponse)) {
+        this.logger.warn(`No results found for: "${searchQuery.term}"`);
+        return this.createEmptySearchHistory(
+          searchQuery.term,
+          searchQuery.limit,
+        );
       }
 
-      const savedSearch = await this.saveSearchWithResults(
+      const savedSearch = await this.persistSearchResults(
         searchQuery,
-        iTunesResponse.results,
+        apiResponse.results,
       );
-
       this.logger.log(
-        `Successfully saved search with ${savedSearch.results.length} results for term: ${searchQuery.term}`,
+        `Saved ${savedSearch.results.length} results for: "${searchQuery.term}"`,
       );
 
       return savedSearch;
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      const errorStack = error instanceof Error ? error.stack : undefined;
-
-      this.logger.error(
-        `Error searching iTunes API: ${errorMessage}`,
-        errorStack,
-      );
-      throw new Error(`Failed to search iTunes API: ${errorMessage}`);
+      this.handleSearchError(error, searchQuery.term);
     }
-  }
-
-  private async searchItunesApi(
-    searchQuery: SearchQueryDto,
-  ): Promise<iTunesSearchResponse> {
-    const params = {
-      term: searchQuery.term,
-      media: searchQuery.media,
-      country: searchQuery.country,
-      limit: searchQuery.limit,
-    };
-
-    const response = await axios.get<iTunesSearchResponse>(this.iTunesApiUrl, {
-      params,
-      timeout: 10000,
-    });
-
-    return response.data;
-  }
-
-  private async saveSearchWithResults(
-    searchQuery: SearchQueryDto,
-    iTunesResults: iTunesSearchResult[],
-  ): Promise<SearchHistory> {
-    const searchHistory = new SearchHistory();
-    searchHistory.searchTerm = searchQuery.term;
-    searchHistory.limit = searchQuery.limit || 50;
-    searchHistory.resultCount = iTunesResults.length;
-
-    const savedSearchHistory =
-      await this.searchHistoryRepository.save(searchHistory);
-
-    const searchResults: SearchResult[] = [];
-
-    for (const iTunesResult of iTunesResults) {
-      try {
-        const searchResult = new SearchResult();
-        searchResult.searchHistoryId = savedSearchHistory.id;
-        searchResult.wrapperType = iTunesResult.wrapperType || '';
-        searchResult.kind = iTunesResult.kind || '';
-        searchResult.trackId = iTunesResult.trackId;
-        searchResult.artistName = iTunesResult.artistName || '';
-        searchResult.collectionName = iTunesResult.collectionName || '';
-        searchResult.trackName = iTunesResult.trackName || '';
-        searchResult.collectionViewUrl = iTunesResult.collectionViewUrl || '';
-        searchResult.trackViewUrl = iTunesResult.trackViewUrl || '';
-        searchResult.artworkUrl30 = iTunesResult.artworkUrl30 || '';
-        searchResult.artworkUrl60 = iTunesResult.artworkUrl60 || '';
-        searchResult.artworkUrl100 = iTunesResult.artworkUrl100 || '';
-        searchResult.collectionPrice = iTunesResult.collectionPrice || 0;
-        searchResult.trackPrice = iTunesResult.trackPrice || 0;
-        searchResult.releaseDate = iTunesResult.releaseDate
-          ? new Date(iTunesResult.releaseDate)
-          : new Date();
-        searchResult.collectionExplicitness =
-          iTunesResult.collectionExplicitness || '';
-        searchResult.trackExplicitness = iTunesResult.trackExplicitness || '';
-        searchResult.trackCount = iTunesResult.trackCount || 0;
-        searchResult.country = iTunesResult.country || '';
-        searchResult.currency = iTunesResult.currency || '';
-        searchResult.primaryGenreName = iTunesResult.primaryGenreName || '';
-        searchResult.longDescription = iTunesResult.longDescription || '';
-
-        const savedResult =
-          await this.searchResultRepository.save(searchResult);
-        searchResults.push(savedResult);
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
-        this.logger.error(
-          `Error saving result with trackId ${iTunesResult.trackId}: ${errorMessage}`,
-        );
-      }
-    }
-
-    savedSearchHistory.results = searchResults;
-    return savedSearchHistory;
   }
 
   async getSearchHistory(): Promise<SearchHistoryItem[]> {
@@ -184,5 +96,186 @@ export class ItunesSearchService {
       where: { id },
       relations: ['results'],
     });
+  }
+
+  private async fetchFromItunesApi(
+    query: SearchQueryDto,
+  ): Promise<iTunesSearchResponse> {
+    const params = {
+      term: query.term,
+      media: query.media,
+      country: query.country,
+      limit: query.limit,
+    };
+
+    const response = await axios.get<iTunesSearchResponse>(this.iTunesApiUrl, {
+      params,
+      timeout: this.apiTimeout,
+    });
+
+    return response.data;
+  }
+
+  private isEmptyResponse(response: iTunesSearchResponse): boolean {
+    return !response.results || response.results.length === 0;
+  }
+
+  private createEmptySearchHistory(
+    term: string,
+    limit?: number,
+  ): SearchHistory {
+    const emptySearch = new SearchHistory();
+    emptySearch.searchTerm = term;
+    emptySearch.limit = limit ?? 50;
+    emptySearch.resultCount = 0;
+    emptySearch.results = [];
+    return emptySearch;
+  }
+
+  private async persistSearchResults(
+    query: SearchQueryDto,
+    results: iTunesSearchResult[],
+  ): Promise<SearchHistory> {
+    const searchHistory = await this.createSearchHistoryRecord(query, 0);
+
+    const searchResults = await this.saveSearchResults(
+      results,
+      searchHistory.id,
+    );
+
+    searchHistory.resultCount = searchResults.length;
+    searchHistory.results = searchResults;
+
+    await this.searchHistoryRepository.save(searchHistory);
+
+    return searchHistory;
+  }
+
+  private async createSearchHistoryRecord(
+    query: SearchQueryDto,
+    resultCount: number,
+  ): Promise<SearchHistory> {
+    const history = new SearchHistory();
+    history.searchTerm = query.term;
+    history.limit = query.limit ?? 50;
+    history.resultCount = resultCount;
+
+    return this.searchHistoryRepository.save(history);
+  }
+
+  private async saveSearchResults(
+    iTunesResults: iTunesSearchResult[],
+    searchHistoryId: number,
+  ): Promise<SearchResult[]> {
+    const results: SearchResult[] = [];
+
+    for (const item of iTunesResults) {
+      try {
+        const result = this.mapToSearchResult(item, searchHistoryId);
+        if (result) {
+          const saved = await this.searchResultRepository.save(result);
+          results.push(saved);
+        }
+      } catch (error) {
+        this.logResultSaveError(error, item.trackId);
+      }
+    }
+
+    return results;
+  }
+
+  private mapToSearchResult(
+    item: iTunesSearchResult,
+    searchHistoryId: number,
+  ): SearchResult | null {
+    if (!item.trackId) {
+      this.logger.debug(
+        `Skipping result without trackId: ${item.wrapperType} - ${item.collectionName || 'Unknown'}`,
+      );
+      return null;
+    }
+
+    const result = new SearchResult();
+
+    result.searchHistoryId = searchHistoryId;
+    result.trackId = item.trackId;
+
+    result.wrapperType = item.wrapperType || '';
+    result.kind = item.kind || '';
+    result.artistName = item.artistName || '';
+    result.collectionName = item.collectionName || '';
+    result.trackName = item.trackName || '';
+
+    result.collectionViewUrl = item.collectionViewUrl || '';
+    result.trackViewUrl = item.trackViewUrl || '';
+
+    result.artworkUrl30 = item.artworkUrl30 || '';
+    result.artworkUrl60 = item.artworkUrl60 || '';
+    result.artworkUrl100 = item.artworkUrl100 || '';
+
+    result.collectionPrice = item.collectionPrice || 0;
+    result.trackPrice = item.trackPrice || 0;
+    result.releaseDate = item.releaseDate
+      ? new Date(item.releaseDate)
+      : new Date();
+
+    result.collectionExplicitness = item.collectionExplicitness || '';
+    result.trackExplicitness = item.trackExplicitness || '';
+
+    result.trackCount = item.trackCount || 0;
+    result.country = item.country || '';
+    result.currency = item.currency || '';
+    result.primaryGenreName = item.primaryGenreName || '';
+    result.longDescription = item.longDescription || '';
+
+    return result;
+  }
+
+  async updateCachedResults(
+    searchQuery: SearchQueryDto,
+    newResults: iTunesSearchResult[],
+  ): Promise<SearchHistory> {
+    const cachedResult = await this.searchHistoryRepository.findOne({
+      where: { searchTerm: searchQuery.term },
+      relations: ['results'],
+    });
+
+    if (!cachedResult) {
+      throw new Error(`No cached result found for term: "${searchQuery.term}"`);
+    }
+
+    await this.searchResultRepository.delete({
+      searchHistoryId: cachedResult.id,
+    });
+
+    const savedResults = await this.saveSearchResults(
+      newResults,
+      cachedResult.id,
+    );
+
+    cachedResult.resultCount = savedResults.length;
+    cachedResult.results = savedResults;
+    cachedResult.limit = searchQuery.limit ?? 50;
+    cachedResult.updatedAt = new Date();
+
+    return this.searchHistoryRepository.save(cachedResult);
+  }
+
+  private handleSearchError(error: unknown, searchTerm: string): never {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const stack = error instanceof Error ? error.stack : undefined;
+
+    this.logger.error(
+      `iTunes API search failed for "${searchTerm}": ${message}`,
+      stack,
+    );
+    throw new Error(`iTunes search failed: ${message}`);
+  }
+
+  private logResultSaveError(error: unknown, trackId?: number): void {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    this.logger.error(
+      `Failed to save result (trackId: ${trackId}): ${message}`,
+    );
   }
 }

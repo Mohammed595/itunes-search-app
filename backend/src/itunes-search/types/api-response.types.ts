@@ -20,8 +20,9 @@ export interface SearchHistoryResponse extends BaseApiResponse {
   data: SearchHistoryItem[];
 }
 
-// iTunes API-style response for empty results
 export interface iTunesEmptyResponse {
+  searchTerm: string;
+  limit: number;
   resultCount: number;
   results: any[];
 }

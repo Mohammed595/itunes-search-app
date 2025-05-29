@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsEnum,
   IsNotEmpty,
@@ -32,11 +33,12 @@ export class SearchQueryDto {
 
   @IsOptional()
   @IsString()
-  country?: string = 'US';
+  country?: string;
 
   @IsOptional()
+  @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
   @Min(1)
   @Max(200)
-  limit?: number = 50;
+  limit?: number;
 }

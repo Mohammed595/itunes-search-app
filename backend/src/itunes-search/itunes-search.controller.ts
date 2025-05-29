@@ -1,14 +1,13 @@
 import {
-  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
   Param,
-  Post,
   Query,
+  ValidationPipe,
 } from '@nestjs/common';
-import { MediaType, SearchQueryDto } from './dto/search-query.dto';
+import { SearchQueryDto } from './dto/search-query.dto';
 import { ItunesSearchService } from './itunes-search.service';
 import {
   SearchHistoryResponse,
@@ -20,73 +19,11 @@ import {
 export class ItunesSearchController {
   constructor(private readonly itunesSearchService: ItunesSearchService) {}
 
-  @Post('search')
-  async search(
-    @Body() searchQuery: SearchQueryDto,
-  ): Promise<SearchResponse | iTunesEmptyResponse> {
-    try {
-      if (!searchQuery.term || searchQuery.term.trim() === '') {
-        throw new HttpException(
-          'Search term is required',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      searchQuery.media = searchQuery.media || MediaType.ALL;
-      searchQuery.country = searchQuery.country || 'SA';
-      searchQuery.limit = searchQuery.limit || 50;
-
-      if (searchQuery.limit < 1 || searchQuery.limit > 200) {
-        throw new HttpException(
-          'Limit must be between 1 and 200',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      const searchHistory = await this.itunesSearchService.search(searchQuery);
-
-      if (searchHistory.resultCount === 0) {
-        return {
-          resultCount: 0,
-          results: [],
-        };
-      }
-
-      return {
-        success: true,
-        data: searchHistory,
-        message: `Found ${searchHistory.resultCount} results for "${searchQuery.term}"`,
-        count: searchHistory.resultCount,
-      };
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      const errorMessage =
-        error instanceof Error ? error.message : 'Somthing went wrong';
-      throw new HttpException(
-        `Search failed: ${errorMessage}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
   @Get('search')
   async searchByQuery(
-    @Query('term') term: string,
-    @Query('media') media?: string,
-    @Query('country') country?: string,
-    @Query('limit') limit?: string,
+    @Query(new ValidationPipe({ transform: true })) searchQuery: SearchQueryDto,
   ): Promise<SearchResponse | iTunesEmptyResponse> {
-    const searchQuery: SearchQueryDto = {
-      term,
-      media: (media as MediaType) || MediaType.ALL,
-      country: country || '',
-      limit: limit ? parseInt(limit, 10) : 50,
-    };
-
-    return this.search(searchQuery);
+    return this.itunesSearchService.search(searchQuery);
   }
 
   @Get('history')
