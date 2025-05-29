@@ -12,6 +12,15 @@ A production-ready REST API built with **NestJS**, **TypeORM**, and **PostgreSQL
 - **Type Safety** - Complete TypeScript implementation with proper validation
 - **Production Ready** - Comprehensive error handling, logging, and validation
 
+## 🔗 Live API
+
+**🌐 Production URL:** `https://itunes-search-app-1hcy.onrender.com/`
+
+Try it now:
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=كلمتك+ياوحش&limit=5"
+```
+
 ## 🏗️ Architecture
 
 ### Database Design
@@ -87,7 +96,8 @@ npm run start:dev
 npm run build && npm run start:prod
 ```
 
-🎉 **API available at:** `http://localhost:3002`
+🎉 **Local Development:** `http://localhost:3000`  
+🌐 **Production API:** `https://itunes-search-app-1hcy.onrender.com/`
 
 ## 🔥 API Reference
 
@@ -106,7 +116,7 @@ GET /api/itunes/search?term={query}&limit={number}&media={type}&country={code}
 
 **Example:**
 ```bash
-curl "http://localhost:3002/api/itunes/search?term=Beatles&limit=5"
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=Beatles&limit=5"
 ```
 
 #### 📊 Get All Searches
@@ -115,11 +125,21 @@ GET /api/itunes/searches
 ```
 Returns all search records with complete results.
 
+**Example:**
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/searches"
+```
+
 #### 🎯 Get Search by ID
 ```http
 GET /api/itunes/search/{id}
 ```
 Returns specific search with all associated results.
+
+**Example:**
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search/1"
+```
 
 #### 📈 Search History Summary
 ```http
@@ -127,11 +147,21 @@ GET /api/itunes/history
 ```
 Returns search terms with result counts.
 
+**Example:**
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/history"
+```
+
 #### 🔎 Results by Search Term
 ```http
 GET /api/itunes/results/{searchTerm}
 ```
 Returns all searches matching the term.
+
+**Example:**
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/results/Beatles"
+```
 
 ### Response Format
 
@@ -177,13 +207,16 @@ Full Unicode support for all languages:
 
 ```bash
 # Arabic
-curl "http://localhost:3002/api/itunes/search?term=فنجان"
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=فنجان"
 
-# Chinese
-curl "http://localhost:3002/api/itunes/search?term=音乐"
+# Chinese  
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=音乐"
 
 # Japanese
-curl "http://localhost:3002/api/itunes/search?term=音楽"
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=音楽"
+
+# Spanish
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=música"
 ```
 
 ## ⚡ Performance Features
@@ -221,7 +254,7 @@ The application has been thoroughly tested with a comprehensive test suite cover
 ### Environment Variables
 ```env
 NODE_ENV=production
-PORT=3002
+PORT=3000
 DB_HOST=your-postgres-host
 DB_PORT=5432
 DB_USERNAME=your-username
@@ -236,7 +269,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 COPY dist ./dist
-EXPOSE 3002
+EXPOSE 3000
 CMD ["node", "dist/main"]
 ```
 
@@ -276,19 +309,37 @@ npm run format         # Code formatting
 ### Search with Filtering
 ```bash
 # Music only, limit 10
-curl "http://localhost:3002/api/itunes/search?term=jazz&media=music&limit=10"
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=jazz&media=music&limit=10"
 
 # Podcasts from specific country
-curl "http://localhost:3002/api/itunes/search?term=tech&media=podcast&country=US"
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=tech&media=podcast&country=US"
+
+# Movies with higher limit
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=marvel&media=movie&limit=20"
 ```
 
 ### Get Analytics
 ```bash
 # Search history summary
-curl "http://localhost:3002/api/itunes/history"
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/history"
 
 # All Beatles searches
-curl "http://localhost:3002/api/itunes/results/Beatles"
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/results/Beatles"
+
+# Get specific search by ID
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search/1"
+```
+
+### Advanced Usage
+```bash
+# Complex search with multiple parameters
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=Taylor%20Swift&media=music&country=US&limit=25"
+
+# Search audiobooks
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=Harry%20Potter&media=audiobook"
+
+# TV Shows search
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=Friends&media=tvShow"
 ```
 
 ## 🎯 Performance Metrics
@@ -298,6 +349,7 @@ curl "http://localhost:3002/api/itunes/results/Beatles"
 - **Memory:** Efficient object mapping and garbage collection
 - **Throughput:** Handles 1000+ concurrent requests
 - **Reliability:** 99.9% uptime with proper error handling
+- **Global CDN:** Fast response times worldwide via Render.com
 
 ## 🛡️ Security & Validation
 
@@ -306,6 +358,26 @@ curl "http://localhost:3002/api/itunes/results/Beatles"
 - Rate limiting ready (implement as needed)
 - CORS configuration available
 - Environment variable protection
+- HTTPS enforced in production
+
+## 🌟 Quick Test
+
+Try these endpoints right now:
+
+1. **Search Beatles music:**
+   ```bash
+   curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=Beatles&limit=3"
+   ```
+
+2. **Get search history:**
+   ```bash
+   curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/history"
+   ```
+
+3. **Search Arabic content:**
+   ```bash
+   curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=أم%20كلثوم"
+   ```
 
 ---
 
@@ -313,4 +385,5 @@ curl "http://localhost:3002/api/itunes/results/Beatles"
 
 Built with ❤️ using modern TypeScript and NestJS best practices.
 
-**Status:** ✅ Production Ready | **Version:** 1.0.0 | **Tests:** 17/17 Passing
+**Status:** ✅ Production Ready | **Version:** 1.0.0 | **Tests:** 17/17 Passing  
+**Live API:** https://itunes-search-app-1hcy.onrender.com/

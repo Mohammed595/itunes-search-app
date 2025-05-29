@@ -4,6 +4,11 @@
 
 The iTunes Search API is a comprehensive REST API that allows you to search for content in the iTunes store and manage search history. This API supports Arabic search terms and provides search functionality for various media types including music, movies, podcasts, audiobooks, and more.
 
+## 🔗 Live API
+
+**🌐 Production URL:** `https://itunes-search-app-1hcy.onrender.com/`  
+**📚 Interactive Documentation:** `https://itunes-search-app-1hcy.onrender.com/api/docs`
+
 ## Features
 
 - 🔍 **iTunes Content Search**: Search for music, movies, podcasts, TV shows, audiobooks, software, and ebooks
@@ -30,14 +35,15 @@ The iTunes Search API is a comprehensive REST API that allows you to search for 
 
 ### Access Points
 
-- **API Base URL**: `http://localhost:3002/api/itunes`
-- **Swagger Documentation**: `http://localhost:3002/api/docs`
+- **API Base URL**: `https://itunes-search-app-1hcy.onrender.com/api/itunes`
+- **Swagger Documentation**: `https://itunes-search-app-1hcy.onrender.com/api/docs`
+- **Local Development**: `http://localhost:3000/api/itunes` (when running locally)
 
 ## API Endpoints
 
 ### 📚 Interactive Documentation
 
-Visit `http://localhost:3002/api/docs` to access the complete interactive Swagger documentation where you can:
+Visit `https://itunes-search-app-1hcy.onrender.com/api/docs` to access the complete interactive Swagger documentation where you can:
 
 - Browse all available endpoints
 - View detailed request/response schemas
@@ -49,23 +55,14 @@ Visit `http://localhost:3002/api/docs` to access the complete interactive Swagge
 
 #### 1. Search iTunes Content
 
-**POST** `/api/itunes/search`
-
-Search for content using detailed parameters in the request body.
-
-**Example Request:**
-```json
-{
-  "term": "طاش ماطاش",
-  "media": "music",
-  "country": "SA",
-  "limit": 25
-}
-```
-
-**GET** `/api/itunes/search?term=طاش ماطاش&media=music&country=SA&limit=25`
+**GET** `/api/itunes/search?term=طاش+ماطاش&media=music&country=SA&limit=25`
 
 Alternative GET endpoint for searching with query parameters.
+
+**Example:**
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=طاش%20ماطاش&media=music&country=SA&limit=25"
+```
 
 #### 2. Search History
 
@@ -73,17 +70,37 @@ Alternative GET endpoint for searching with query parameters.
 
 Retrieve all unique search terms that have been searched.
 
+**Example:**
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/history"
+```
+
 **GET** `/api/itunes/searches`
 
 Get all search history entries with their complete results.
+
+**Example:**
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/searches"
+```
 
 **GET** `/api/itunes/search/{id}`
 
 Retrieve a specific search and its results by search ID.
 
+**Example:**
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search/1"
+```
+
 **GET** `/api/itunes/results/{searchTerm}`
 
 Get all searches and results for a specific search term.
+
+**Example:**
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/results/Beatles"
+```
 
 ## Request/Response Examples
 
@@ -132,6 +149,30 @@ Content-Type: application/json
   "message": "Found 8 results for \"طاش ماطاش\"",
   "count": 8
 }
+```
+
+## Live Testing Examples
+
+Try these endpoints directly:
+
+### 1. Search Beatles Music
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=Beatles&limit=5"
+```
+
+### 2. Search Arabic Content
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=أم%20كلثوم&media=music"
+```
+
+### 3. Search Movies
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/search?term=Marvel&media=movie&limit=10"
+```
+
+### 4. Get Search History
+```bash
+curl "https://itunes-search-app-1hcy.onrender.com/api/itunes/history"
 ```
 
 ## Media Types
@@ -219,17 +260,25 @@ DB_DATABASE=itunes_search_db
 
 ## Testing with Swagger UI
 
-1. Open `http://localhost:3002/api/docs`
+1. Open `https://itunes-search-app-1hcy.onrender.com/api/docs`
 2. Click on any endpoint to expand it
 3. Click "Try it out" to test the endpoint
 4. Fill in the required parameters
 5. Click "Execute" to send the request
 6. View the response in the browser
 
+## Production Features
+
+- ✅ **HTTPS Secured** - All API calls are encrypted
+- ✅ **Global CDN** - Fast response times worldwide
+- ✅ **Auto Scaling** - Handles traffic spikes automatically
+- ✅ **Database Backup** - Automated PostgreSQL backups
+- ✅ **Error Monitoring** - Comprehensive logging and monitoring
+
 ## Support
 
 For API support and questions:
-- Check the interactive documentation at `/api/docs`
+- Check the interactive documentation at `https://itunes-search-app-1hcy.onrender.com/api/docs`
 - Review the request/response examples
 - Ensure your request format matches the schema
 
