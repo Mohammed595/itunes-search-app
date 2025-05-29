@@ -1,11 +1,11 @@
 import { SearchResponse } from '@/types/search';
 
 export class SearchService {
-  private static readonly BASE_URL = process.env.BASE_URL;
+  private static readonly baseUrl = process.env.BASE_URL;
 
   static async search(term: string, limit: number = 20): Promise<SearchResponse> {
     try {
-      const url = `${this.BASE_URL}/api/itunes/search?term=${encodeURIComponent(term)}&limit=${limit}`;
+      const url = `${this.baseUrl}/api/itunes/search?term=${encodeURIComponent(term)}&limit=${limit}`;
       console.log('🔍 Searching with URL:', url);
       
       const response = await fetch(url, {
