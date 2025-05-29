@@ -1,7 +1,7 @@
 import { SearchResponse } from '@/types/search';
 
 export class SearchService {
-  private static readonly BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3002';
+  private static readonly BASE_URL = process.env.BASE_URL;
 
   static async search(term: string, limit: number = 20): Promise<SearchResponse> {
     try {
