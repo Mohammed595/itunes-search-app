@@ -10,11 +10,11 @@ import { ItunesSearchModule } from './itunes-search/itunes-search.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: process.env.HOST_DB || 'dpg-d0s85963jp1c73eepb30-a',
       port: 5432,
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_DATABASE || 'postgres',
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
       entities: [SearchResult, SearchHistory],
       synchronize: true,
     }),
