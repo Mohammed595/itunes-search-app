@@ -1,7 +1,7 @@
 import { SearchResponse } from '@/types/search';
 
 export class SearchService {
-  private static readonly baseUrl = process.env.BASE_URL;
+  private static readonly baseUrl = 'https://itunes-search-app-1hcy.onrender.com/';
 
   static async search(term: string, limit: number = 20): Promise<SearchResponse> {
     try {
