@@ -5,12 +5,10 @@ A modern, dark-themed frontend application built with Next.js and TypeScript for
 ## ✨ Features
 
 - **Modern Dark Theme** - Sleek design with gradient backgrounds and glowing effects
-- **Real-time Search** - Fast search functionality with iTunes API integration
 - **Responsive Grid Layout** - Adaptive layout for mobile, tablet, and desktop
 - **Loading States** - Smooth loading animations and user feedback
 - **Error Handling** - Comprehensive error management with user-friendly messages
 - **TypeScript** - Full type safety throughout the application
-- **Clean Architecture** - Well-organized component structure and separation of concerns
 
 ## 🎨 Design
 
@@ -66,21 +64,6 @@ src/
    npm start
    ```
 
-## 🔧 Configuration
-
-The frontend connects to the backend API running on `http://localhost:3002`. The API endpoint is configured in `src/services/searchService.ts`.
-
-### Environment Variables
-
-No environment variables are required for basic functionality.
-
-## 📊 API Integration
-
-The frontend communicates with the NestJS backend through:
-- **Endpoint:** `http://localhost:3002/api/itunes/search`
-- **Method:** GET
-- **Parameters:** `term`, `limit`
-- **Response:** JSON with search results
 
 ## 🎯 Usage
 
@@ -120,44 +103,3 @@ The application uses React hooks for state management:
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
 
-## 🐛 Debugging
-
-The application includes comprehensive console logging for debugging:
-- API request/response logging
-- Search state tracking
-- Error reporting
-
-## 🔧 Development
-
-### Adding New Components
-1. Create component in `src/components/`
-2. Export from component file
-3. Import and use in parent components
-
-### Updating Styles
-1. Modify CSS variables in `globals.css`
-2. Use Tailwind classes for component styling
-3. Apply dark theme consistently
-
-### API Changes
-1. Update types in `src/types/search.ts`
-2. Modify service calls in `src/services/searchService.ts`
-3. Update component props if needed
-
-## 📱 Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## 🤝 Contributing
-
-1. Follow the existing code structure
-2. Maintain TypeScript types
-3. Use consistent styling patterns
-4. Test across different screen sizes
-
-## 📄 License
-
-This project is part of the iTunes Search Application monorepo.
