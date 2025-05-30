@@ -4,6 +4,6 @@ import { Controller, Get } from '@nestjs/common';
 export class AppController {
   @Get('/')
   welcomingMessage(): string {
-    return 'يالله حيه مافيه شي هنا، موقع كل شي داخل backend/readme.md';
+    return 'يالله حيه مافيه شي هنا، التفاصيل في  backend/readme.md';
   }
 }
