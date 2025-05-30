@@ -1,7 +1,9 @@
-import { Controller } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  @Get('/')
+  welcomingMessage(): string {
+    return 'يالله حيه مافيه شي هنا، موقع كل شي داخل backend/readme.md';
+  }
 }
